@@ -655,84 +655,35 @@ async function saveProduct(d,actor){
     };
   }
 
-  const product={
+  const product = {
+  shopId,
+  shopName,
+  userId,
+  barcode,
+  name: clean(d.name),
+  brand: clean(d.brand),
+  category: clean(d.category),
+  mrp: clean(d.mrp),
+  sellingPrice: clean(d.sellingPrice),
+  manufacturingDate: clean(d.manufacturingDate),
+  expiryDate: clean(d.expiryDate),
+  quantity,
+  rfidUid: old?.rfidUid || '',
+  rfidStatus: active >= quantity ? 'ASSIGNED' : 'PENDING',
+  barcodeSource: clean(d.barcodeSource) || 'camera',
+  detailsSource: clean(d.detailsSource) || 'ocr',
+  ocrText: clean(d.ocrText),
+  updatedAt: new Date()
+};
 
-    shopId,
-
-    shopName,
-
-    userId,
-
-    barcode,
-
-    name:
-      clean(d.name),
-
-    brand:
-      clean(d.brand),
-
-    category:
-      clean(d.category),
-
-    mrp:
-      clean(d.mrp),
-
-    sellingPrice:
-      clean(d.sellingPrice),
-
-    manufacturingDate:
-      clean(d.manufacturingDate),
-
-    expiryDate:
-      clean(d.expiryDate),
-
-    quantity,
-
-    rfidUid:
-      old?.rfidUid || '',
-
-    rfidStatus:
-      active>=quantity
-        ? 'ASSIGNED'
-        : 'PENDING',
-
-    barcodeSource:
-      clean(d.barcodeSource) ||
-      'camera',
-
-    detailsSource:
-      clean(d.detailsSource) ||
-      'ocr',
-
-    ocrText:
-      clean(d.ocrText),
-
-    updatedAt:
-      new Date(),
-
-    createdAt:
-      old?.createdAt ||
-      new Date()
-
-  };
-
-  await products.updateOne(
-    {
-      shopId,
-      barcode
-    },
-    {
-      $set:product,
-
-      $setOnInsert:{
-        createdAt:
-          product.createdAt
-      }
-    },
-    {
-      upsert:true
-    }
-  );
+await products.updateOne(
+  { shopId, barcode },
+  {
+    $set: product,
+    $setOnInsert: { createdAt: new Date() }
+  },
+  { upsert: true }
+);
 
   const targetPending=
     Math.max(
