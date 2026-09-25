@@ -676,11 +676,15 @@ async function saveProduct(d,actor){
   updatedAt: new Date()
 };
 
+const { createdAt, ...productWithoutCreatedAt } = product;
+
 await products.updateOne(
   { shopId, barcode },
   {
-    $set: product,
-    $setOnInsert: { createdAt: new Date() }
+    $set: productWithoutCreatedAt,
+    $setOnInsert: {
+      createdAt: createdAt
+    }
   },
   { upsert: true }
 );
